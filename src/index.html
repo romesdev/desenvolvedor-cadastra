@@ -5,14 +5,91 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Desenvolvedor Cadastra</title>
+  <title>Loja cadastra</title>
   <link rel="stylesheet" href="main.css" />
 </head>
-
 <body>
 
+  <!-- Header -->
+  <header>
+    <img src="./img/cadastraLogo.png" alt="" class="logo"/>
+    <div class="cart-container">
+      <img class="cart_image" src="./img/cart.png" alt="">
+      <span id="cart-count" class="cart-count">0</span>
+    </div>
+    <!-- <div class="cart">
+      <span id="cart-count" class="cart-count">0</span>
+      <img src="./img/cart.png" alt="Carrinho">
+    </div> -->
+  </header>
+
+   <div class="title">
+      
+      <h1>Blusas</h1>
+      <div class="sort-options">
+          <select id="sort-select">
+            <option value="0" selected hidden>Ordenar por:</option>
+            <option value="1">Mais recentes</option>
+            <option value="2">Menor preço</option>
+            <option value="3">Maior preço</option>
+          </select>
+        </div>
+    </div>
+
+  <!-- Main Content -->
+  <div class="content">
+   
+    
+    <!-- Sidebar de Filtros -->
+    <aside>
+      <div class="filter">
+        <h2>CORES</h2>
+        <section id="color-container" class="color-container"></section>
+        <!-- <label><input type="checkbox" value="red"> Vermelho</label>
+        <label><input type="checkbox" value="blue"> Azul</label>
+        <label><input type="checkbox" value="green"> Verde</label> -->
+      </div>
+
+      <div class="filter">
+        <h2>TAMANHOS</h2>
+       <section id="size-container" class="size-container"></section>
+
+
+        <!-- <label><input type="checkbox" value="small"> Pequeno</label>
+        <label><input type="checkbox" value="medium"> Médio</label>
+        <label><input type="checkbox" value="large"> Grande</label> -->
+      </div>
+
+      <div class="filter">
+        <h2>FAIXA DE PREÇO</h2>
+        <section id="price-container" class="price-container"></section>
+        <!-- <label><input type="checkbox" name="price" value="low"> Abaixo de R$50</label>
+        <label><input type="checkbox" name="price"value="mid"> R$50 - R$100</label>
+        <label><input type="checkbox" name="price" value="high"> Acima de R$100</label> -->
+      </div>
+    
+       <!-- Botões de Aplicar e Limpar Filtros -->
+      <div class="filter-actions">
+        <button id="apply-filters" class="apply">APLICAR</button>
+        <button id="clear-filters" class="clear">LIMPAR</button>
+      </div>
+    </aside>
+
+    <!-- Grid de Produtos -->
+    <main>
+      <div class="product-grid" id="product-grid">
+        <!-- Produtos serão gerados dinamicamente -->
+      </div>
+      <button id="load-more">CARREGAR MAIS</button>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>CADASTRA: IMPLANTAÇÃO DE E-COMMERCE VTEX</p>
+  </footer>
+
 </body>
-<h1>Desafio Cadastra</h1>
 
 <script src="bundle.js"></script>
 
