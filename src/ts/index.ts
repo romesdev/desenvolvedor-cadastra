@@ -122,9 +122,21 @@ function renderFilterOptions() {
   const sizeContainer = document.getElementById("size-container");
   const priceContainer = document.getElementById("price-container");
 
+
+  const priceMobile = document.getElementById("price-container-mobile");
+  const sizeMobile = document.getElementById("size-container-mobile");
+  const colorMobile = document.getElementById("color-container-mobile");
+
+
+
+
   colorContainer.innerHTML = '';
   sizeContainer.innerHTML = '';
   priceContainer.innerHTML = '';
+
+  priceMobile.innerHTML = '';
+  sizeMobile.innerHTML = '';
+  colorMobile.innerHTML = '';
 
   
   priceRanges.forEach(priceRange => {
@@ -148,9 +160,32 @@ function renderFilterOptions() {
           selectedPriceRanges = selectedPriceRanges.filter(range => range.min !== priceRange.min || range.max !== priceRange.max);
         }
       });
-
       priceContainer.appendChild(itemDiv);
     });
+
+    priceRanges.forEach(priceRange => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('price-item');
+  
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = priceRange.label;
+        itemDiv.appendChild(input);
+  
+        const label = document.createElement('label');
+        label.textContent = priceRange.label;
+        itemDiv.appendChild(label);
+  
+        input.addEventListener('change', (event) => {
+          const target = event.target as HTMLInputElement;
+          if (target.checked) {
+            selectedPriceRanges.push({ min: priceRange.min, max: priceRange.max });
+          } else {
+            selectedPriceRanges = selectedPriceRanges.filter(range => range.min !== priceRange.min || range.max !== priceRange.max);
+          }
+        });
+        priceMobile.appendChild(itemDiv)
+      });
 
     const sizes = new Set<string>();
 
@@ -177,9 +212,30 @@ function renderFilterOptions() {
           button.classList.add('selected');
         }
       });
-
       sizeContainer.appendChild(button);
     });
+
+
+    sizes.forEach(size => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.classList.add('size-button');
+      button.textContent = size;
+
+      button.addEventListener('click', () => {
+        if (selectedSizes.has(size)) {
+          selectedSizes.delete(size);
+          button.classList.remove('selected');
+        } else {
+          selectedSizes.add(size);
+          button.classList.add('selected');
+        }
+      });
+
+      sizeMobile.appendChild(button);
+
+    });
+    
 
     const colors = new Set<string>();
 
@@ -212,12 +268,37 @@ function renderFilterOptions() {
 
       colorContainer.appendChild(itemDiv);
     });
+
+    colors.forEach(color => {
+      const itemDiv = document.createElement('div');
+      itemDiv.classList.add(`color-item`);
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.value = color.toString();
+      itemDiv.appendChild(input);
+
+      const label = document.createElement('label');
+      label.textContent = color.toString();
+      itemDiv.appendChild(label);
+
+      input.addEventListener('change', (event) => {
+        const target = event.target as HTMLInputElement;
+        if (target.checked) {
+          selectedColors.add(target.value);
+        } else {
+          selectedColors.delete(target.value);
+        }
+      });
+
+      colorMobile.appendChild(itemDiv.cloneNode(true))
+    });
   }
 
 function applyFilters() {
   const selectedColors = Array.from(document.querySelectorAll('input[name="color"]:checked')).map(input => (input as HTMLInputElement).value );
-  // const selectedPrices = Array.from(document.querySelectorAll('input[name="price"]:checked')).map(input => (input as HTMLInputElement).value );
   const selectedSizes = Array.from(document.querySelectorAll('input[name="size"]:checked')).map(input => (input as HTMLInputElement).value );
+
 
   filtersToApply.colors = new Set(selectedColors);
   filtersToApply.sizes = new Set(selectedSizes);
@@ -236,7 +317,6 @@ function clearFilters() {
   loadMore.style.display = 'block'
   productsPerPage = 5
 
-
   renderProducts(products.slice(0, productsPerPage));
 }
 
@@ -252,15 +332,8 @@ function filterProducts() {
 
     return isColorMatch && isSizeMatch && isPriceMatch;
   });
-  
-  // if (filteredProducts.length <= perPage) {
-  //   const loadMore = document.getElementById('load-more')
-  //   loadMore.style.display = 'none'
-  // }
 
   return filteredProducts
-
-  // renderProducts(filteredProducts.slice(0, perPage));
 }
 
 function sortProducts (sortedProducts: Product[], sortValue: string) {
@@ -323,8 +396,35 @@ async function main() {
 
       renderProducts(sorted.slice(0, productsPerPage));
   });
-    document.getElementById('clear-filters')?.addEventListener('click', clearFilters);
+    
+  document.getElementById('clear-filters')?.addEventListener('click', clearFilters);
   
+
+    // click to apply and clear filters
+    document.getElementById('apply-filters-mobile')?.addEventListener('click', () => {
+      const filteredProducts = applyFilters()
+
+      if(productsPerPage >= filteredProducts.length) {
+        loadMore.style.display = 'none'
+      } else {
+        loadMore.style.display = 'block'
+      }
+
+      const sortSelect = document.getElementById("sort-select") as HTMLSelectElement;
+      const sortValue = sortSelect.value
+
+      const sorted = sortValue !== "0" ? sortProducts(filteredProducts, sortValue) : filteredProducts
+
+      renderProducts(sorted.slice(0, productsPerPage));
+      document.getElementById('filter-menu').style.display = 'none';
+  });
+    document.getElementById('clear-filters-mobile')?.addEventListener('click',  () => { 
+      clearFilters() 
+      document.getElementById('filter-menu').style.display = 'none';
+
+    });
+
+
     // order products
     document.getElementById('sort-select')?.addEventListener('change', (e) => {
       const target =  e.target as HTMLTextAreaElement;
@@ -345,11 +445,54 @@ async function main() {
       const products = sortProducts(data, sortValue)
       renderProducts(products.slice(0, productsPerPage))
     });
+
+    const sortButtons = document.querySelectorAll('.sort-options-mobile button');
+
+// Adiciona um event listener para cada botão
+sortButtons.forEach(button => {
+  button.addEventListener('click', function() {
+    const sortValue = this.getAttribute('data-value'); // Captura o valor do atributo data-value
+    if(hasFilters()) {
+      const filtered = applyFilters()
+      const sorted = sortProducts(filtered, sortValue)
+
+      if(productsPerPage >= sorted.length) {
+        loadMore.style.display = 'none'
+      }
+
+      renderProducts(sorted.slice(0, productsPerPage))
+      document.getElementById('sort-menu').style.display = 'none';
+      return
+    }
+
+    const products = sortProducts(data, sortValue)
+    renderProducts(products.slice(0, productsPerPage))
+    document.getElementById('sort-menu').style.display = 'none';
+  })
+
+})
+
 } catch (error) {
   console.error("error on load products", error);
 }
 
 }
+
+document.getElementById('filter-btn').addEventListener('click', function() {
+  document.getElementById('filter-menu').style.display = 'block';
+});
+
+document.getElementById('sort-btn').addEventListener('click', function() {
+  document.getElementById('sort-menu').style.display = 'block';
+});
+
+document.getElementById('close-filter-menu').addEventListener('click', function() {
+  document.getElementById('filter-menu').style.display = 'none';
+});
+
+document.getElementById('close-sort-menu').addEventListener('click', function() {
+  document.getElementById('sort-menu').style.display = 'none';
+});
 
 document.addEventListener("DOMContentLoaded", main);
 
