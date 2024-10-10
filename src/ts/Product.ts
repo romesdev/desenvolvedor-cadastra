@@ -8,3 +8,9 @@ export interface Product {
   size: Array<string>;
   date: string;
 }
+
+export interface PriceRange {
+  label: string;
+  min: number;
+  max: number;
+}
